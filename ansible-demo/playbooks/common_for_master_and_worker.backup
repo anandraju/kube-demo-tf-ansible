@@ -1,0 +1,56 @@
+---
+- name: common installations
+  hosts: all
+  become: yes
+  become_user: root
+  vars_files:
+  - env_variables 
+
+
+  tasks:
+    - name: Create a repository file for kubernetes
+      file:
+        path: /etc/yum.repos.d/kubernetes.repo
+        state: touch
+
+    - name: Adding details into kubernetes repo file
+      blockinfile:
+        path: /etc/yum.repos.d/kubernetes.repo
+        block: |
+          [kubernetes]
+          name=Kubernetes
+          baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+          enabled=1
+          gpgcheck=1
+          repo_gpgcheck=1
+          gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+
+    - name: installed docker, kubeadm and kubectl
+      yum:
+        name: "{{ packages }}"
+        state: present
+
+    - name: service started and enabled for docker, kubeadm and kubectl
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items: "{{ services }}"
+
+    - name: Allow network ports in firewalld 
+      tags: testing
+      firewalld:
+        zone: public
+        port: "{{ item }}"
+        state: enabled
+        permanent: yes
+        immediate: yes
+      with_items: "{{ ports }}"
+
+      #    - name: Set "1" to bridge firewall rules
+      #sysctl:
+      #  name: /proc/sys/net/bridge/bridge-nf-call-iptables
+      #  value: 1
+      #  state: present
+      # tags: firewalld

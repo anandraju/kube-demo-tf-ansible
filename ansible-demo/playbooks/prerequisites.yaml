@@ -1,0 +1,19 @@
+- name: Prerequisites setup on remote servers
+  hosts: all
+  become: yes
+  vars_files:
+  - env_variables
+
+  tasks:
+  - name: Copied /etc/hosts contents to remote servers
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_host }} {{item}}"
+      state: present
+    when: hostvars[item].ansible_host is defined
+    with_items: "{{ groups.all }}"
+
+  - name: Disabling swap on all nodes
+    shell: swapoff -a
+

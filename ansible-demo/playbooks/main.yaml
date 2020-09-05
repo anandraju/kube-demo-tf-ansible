@@ -1,0 +1,8 @@
+- name: play prerequisities 
+  import_playbook: ./prerequisites.yaml
+
+- name: play common for all hosts
+  import_playbook: ./common_for_master_and_worker.yaml
+
+- name: Configure Kubernetes Master
+  import_playbook: ./master_setup.yaml

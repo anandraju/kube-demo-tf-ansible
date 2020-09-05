@@ -1,0 +1,21 @@
+packages:
+- docker
+- kubeadm
+- kubectl
+- firewalld
+
+services:
+- docker
+- kubeadm
+- kubelet
+#- firewalld
+
+#ports:
+#- 6443/tcp
+#- 10250/tcp
+
+###################################
+#master node variables
+###################################
+api_ad_address: 192.168.10.1/24
+pod_nw_cidr: 172.16.0.0/16
